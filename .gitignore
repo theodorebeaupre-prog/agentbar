@@ -1,0 +1,6 @@
+.build/
+.DS_Store
+*.xcodeproj
+!App/AgentBar.xcodeproj
+DerivedData/
+App/build/
