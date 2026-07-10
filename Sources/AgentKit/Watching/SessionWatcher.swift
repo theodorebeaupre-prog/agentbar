@@ -25,13 +25,27 @@ public final class SessionWatcher: @unchecked Sendable {
         self.watchWindow = watchWindow
     }
 
+    deinit {
+        // Capture values to avoid strong self reference in async block after dealloc.
+        let timer = self.timer
+        let dirSources = self.dirSources
+        let continuations = self.continuations
+        queue.async {
+            timer?.cancel()
+            dirSources.forEach { $0.cancel() }
+            continuations.values.forEach { $0.finish() }
+        }
+    }
+
     public func snapshots() -> AsyncStream<[SessionSnapshot]> {
         AsyncStream { continuation in
             let id = UUID()
             queue.async {
                 self.continuations[id] = continuation
                 self.startIfNeeded()
-                continuation.yield(self.computeSnapshots()) // immediate first value
+                let snaps = self.computeSnapshots() // immediate first value
+                self.lastEmitted = snaps
+                continuation.yield(snaps)
             }
             continuation.onTermination = { [weak self] _ in
                 self?.queue.async { self?.continuations[id] = nil }
@@ -77,9 +91,9 @@ public final class SessionWatcher: @unchecked Sendable {
     private func scheduleDebouncedRefresh() {
         guard !debouncePending else { return }
         debouncePending = true
-        queue.asyncAfter(deadline: .now() + .milliseconds(500)) {
-            self.debouncePending = false
-            self.refresh()
+        queue.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+            self?.debouncePending = false
+            self?.refresh()
         }
     }
 
