@@ -12,17 +12,23 @@
 		A8C519877FACB6CD2FE5894A /* LiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52205F239B113F186EC384B7 /* LiveView.swift */; };
 		AB2D704957F73F13256FECAA /* AgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB4DDD2A93C84CF6E0626C5A /* AgentKit */; };
 		B3852F251393CD405C85610B /* SessionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0469950F51798C0F9C740EFD /* SessionRow.swift */; };
+		C6F306CEA6585F1CBF35B4D0 /* AuditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A347617071A4EDA33014833C /* AuditView.swift */; };
 		D9A0482768C319701BB623DC /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB42A83424D29E3582645FE /* NotificationManager.swift */; };
+		DB31F7B5621DA0181E0C5087 /* SessionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D5BCBB54C6C1758CC40F40 /* SessionsView.swift */; };
+		E7581B86665A6CD4158A00C1 /* MainWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2020AB19A0D88DCA3D2D4436 /* MainWindow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0469950F51798C0F9C740EFD /* SessionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRow.swift; sourceTree = "<group>"; };
 		0CB42A83424D29E3582645FE /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		2020AB19A0D88DCA3D2D4436 /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		2B97C58A669DB6ABA171CEB0 /* AgentBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBarApp.swift; sourceTree = "<group>"; };
 		52205F239B113F186EC384B7 /* LiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveView.swift; sourceTree = "<group>"; };
 		77DF56A57A96571BDFA76181 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		8C697943A1B786CCC3DD560F /* AgentBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AgentBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		98E92548804DF2EE37E66D55 /* AgentBar */ = {isa = PBXFileReference; lastKnownFileType = folder; name = AgentBar; path = ..; sourceTree = SOURCE_ROOT; };
+		A347617071A4EDA33014833C /* AuditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuditView.swift; sourceTree = "<group>"; };
+		B1D5BCBB54C6C1758CC40F40 /* SessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,10 +64,13 @@
 			isa = PBXGroup;
 			children = (
 				2B97C58A669DB6ABA171CEB0 /* AgentBarApp.swift */,
+				A347617071A4EDA33014833C /* AuditView.swift */,
 				52205F239B113F186EC384B7 /* LiveView.swift */,
+				2020AB19A0D88DCA3D2D4436 /* MainWindow.swift */,
 				0CB42A83424D29E3582645FE /* NotificationManager.swift */,
 				0469950F51798C0F9C740EFD /* SessionRow.swift */,
 				77DF56A57A96571BDFA76181 /* SessionStore.swift */,
+				B1D5BCBB54C6C1758CC40F40 /* SessionsView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -135,10 +144,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				11AECCD16F5C0A98215D7404 /* AgentBarApp.swift in Sources */,
+				C6F306CEA6585F1CBF35B4D0 /* AuditView.swift in Sources */,
 				A8C519877FACB6CD2FE5894A /* LiveView.swift in Sources */,
+				E7581B86665A6CD4158A00C1 /* MainWindow.swift in Sources */,
 				D9A0482768C319701BB623DC /* NotificationManager.swift in Sources */,
 				B3852F251393CD405C85610B /* SessionRow.swift in Sources */,
 				5D8D25E88840E19270DEC096 /* SessionStore.swift in Sources */,
+				DB31F7B5621DA0181E0C5087 /* SessionsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -44,4 +44,15 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
         NotificationCenter.default.post(name: .agentBarOpenMainWindow, object: nil)
         completion()
     }
+
+    /// Without this, UNUserNotificationCenter suppresses banners/sounds while
+    /// AgentBar is the frontmost app — since AgentBar is a menu-bar-only
+    /// (LSUIElement) app that's often "frontmost" in a loose sense whenever its
+    /// menu is open, notifications would silently vanish without this override.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completion:
+                                    @escaping (UNNotificationPresentationOptions) -> Void) {
+        completion([.banner, .sound])
+    }
 }

@@ -17,7 +17,7 @@ public enum Severity: String, Comparable, Sendable {
     public static func < (a: Severity, b: Severity) -> Bool { a == .yellow && b == .red }
 }
 
-public struct AuditFinding: Equatable, Sendable {
+public struct AuditFinding: Equatable, Hashable, Sendable {
     public let ruleID: String
     public let severity: Severity
     public let title: String

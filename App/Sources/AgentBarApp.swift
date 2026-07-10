@@ -16,5 +16,9 @@ struct AgentBarApp: App {
             }
         }
         .menuBarExtraStyle(.window)
+
+        Window("AgentBar", id: "main") {
+            MainWindow(store: store)
+        }
     }
 }

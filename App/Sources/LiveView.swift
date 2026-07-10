@@ -3,6 +3,7 @@ import AgentKit
 
 struct LiveMenuContent: View {
     @ObservedObject var store: SessionStore
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -19,10 +20,14 @@ struct LiveMenuContent: View {
                 Text("AgentBar \(AgentKitInfo.version)").font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
+                Button("Open AgentBar") { openWindow(id: "main") }.font(.caption)
                 Button("Quit") { NSApp.terminate(nil) }.font(.caption)
             }.padding(.horizontal, 12).padding(.bottom, 8)
         }
         .frame(width: 340)
+        .onReceive(NotificationCenter.default.publisher(for: .agentBarOpenMainWindow)) { _ in
+            openWindow(id: "main")
+        }
     }
 
     /// Waiting sessions pinned to the top (spec).
