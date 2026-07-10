@@ -38,4 +38,40 @@ final class SessionDiscoveryTests: XCTestCase {
         XCTAssertEqual(all.count, 2)
         XCTAssertTrue(all.allSatisfy { $0.session.lastEventAt != nil })
     }
+
+    func testParseAllModifiedWithinCutoffExcludesOldFiles() throws {
+        let home = try makeFakeHome()
+        // Find and backdate one of the session files.
+        let sessionFile = FileManager.default.enumerator(
+            at: home,
+            includingPropertiesForKeys: [.isRegularFileKey]
+        )?.compactMap { item -> URL? in
+            guard let url = item as? URL,
+                  url.pathExtension == "jsonl",
+                  let isRegular = try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile,
+                  isRegular else { return nil }
+            return url
+        }.first
+
+        guard let fileToBackdate = sessionFile else {
+            XCTFail("No .jsonl file found in fake home")
+            return
+        }
+
+        // Backdate one file to 2 hours in the past.
+        try FileManager.default.setAttributes(
+            [.modificationDate: Date(timeIntervalSinceNow: -7200)],
+            ofItemAtPath: fileToBackdate.path
+        )
+
+        let d = SessionDiscovery(home: home)
+
+        // With a 1-hour (3600 second) cutoff, the 2-hour-old file should be excluded.
+        let withinOneHour = d.parseAll(modifiedWithin: 3600)
+        XCTAssertEqual(withinOneHour.count, 1, "Should exclude files modified more than 1 hour ago")
+
+        // With no cutoff, both files should be included.
+        let withoutCutoff = d.parseAll(modifiedWithin: nil)
+        XCTAssertEqual(withoutCutoff.count, 2, "Should include all files when no cutoff is specified")
+    }
 }

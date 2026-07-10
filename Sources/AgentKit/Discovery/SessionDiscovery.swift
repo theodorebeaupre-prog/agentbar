@@ -27,6 +27,7 @@ public struct SessionDiscovery: Sendable {
                let mtime = try? url.resourceValues(forKeys: [.contentModificationDateKey])
                    .contentModificationDate,
                mtime < cutoff { return nil }
+            // Files whose modification date can't be read are deliberately included (fail-open).
             switch provider {
             case .claudeCode: return try? ClaudeCodeParser.parse(fileAt: url)
             case .codex: return try? CodexParser.parse(fileAt: url)
