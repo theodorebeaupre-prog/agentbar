@@ -22,7 +22,9 @@ public enum StateClassifier {
             }
             if toolUses.isEmpty {
                 // Turn looks finished; give the file a moment to settle.
-                return age >= thresholds.settle ? .waitingForInput : .working
+                // Measure settle delay from the meaningful event, not trailing noise.
+                let settleAge = now.timeIntervalSince(meaningful.timestamp)
+                return settleAge >= thresholds.settle ? .waitingForInput : .working
             }
             return .working
         case .userMessage:

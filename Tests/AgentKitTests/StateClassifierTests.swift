@@ -50,6 +50,15 @@ final class StateClassifierTests: XCTestCase {
             event(.meta, ageSeconds: 18),
         ]), .waitingForInput)
     }
+    func testFreshMetaNoiseDoesNotResetSettleClock() {
+        // Regression: trailing meta noise must not mask settled state.
+        // Assistant finished 100s ago, meta arrived 2s ago → settle clock measures
+        // the assistant message (100s), not the noise (2s).
+        XCTAssertEqual(classify([
+            event(.assistantMessage(text: "done", toolUses: []), ageSeconds: 100),
+            event(.meta, ageSeconds: 2),
+        ]), .waitingForInput)
+    }
     func testUnknownKindIsUnknown() {
         XCTAssertEqual(classify([event(.unknown, ageSeconds: 10)]), .unknown)
     }
