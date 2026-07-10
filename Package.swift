@@ -20,6 +20,10 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
-        .testTarget(name: "AgentKitTests", dependencies: ["AgentKit"]),
+        .testTarget(
+            name: "AgentKitTests",
+            dependencies: ["AgentKit"],
+            resources: [.copy("Fixtures")]
+        ),
     ]
 )
