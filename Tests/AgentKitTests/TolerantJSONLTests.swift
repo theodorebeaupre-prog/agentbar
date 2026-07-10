@@ -35,4 +35,26 @@ final class TolerantJSONLTests: XCTestCase {
         XCTAssertNil(Timestamps.parse("not a date"))
         XCTAssertNil(Timestamps.parse(nil))
     }
+
+    func testLossyUTF8DecodingWithInvalidBytes() throws {
+        let validLine = """
+        {"type":"valid","n":1}
+        """
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString + ".jsonl")
+
+        // Build data with valid line, newline, then invalid UTF-8 bytes, then another newline
+        var data = Data()
+        data.append(validLine.data(using: .utf8)!)
+        data.append("\n".data(using: .utf8)!)
+        data.append(contentsOf: [0xFF, 0xFE])  // Invalid UTF-8 sequence
+        data.append("\n".data(using: .utf8)!)
+
+        try data.write(to: url)
+        let (objects, skipped) = try TolerantJSONL.objects(at: url)
+
+        XCTAssertEqual(objects.count, 1, "Should parse the valid JSON line")
+        XCTAssertEqual(skipped, 1, "Should count the line with invalid UTF-8 as skipped")
+        XCTAssertEqual(objects[0]["type"] as? String, "valid")
+    }
 }
