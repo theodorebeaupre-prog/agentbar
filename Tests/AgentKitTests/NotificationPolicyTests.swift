@@ -32,4 +32,18 @@ final class NotificationPolicyTests: XCTestCase {
         XCTAssertTrue(p.shouldNotify(sessionID: "b", newState: .waitingForInput,
                                      now: t0.addingTimeInterval(1)))
     }
+
+    func testSeededFirstObservationOfWaitingDoesNotNotify() {
+        var p = NotificationPolicy()
+        p.seed(sessionID: "s", state: .waitingForInput)
+        XCTAssertFalse(p.shouldNotify(sessionID: "s", newState: .waitingForInput,
+                                      now: t0.addingTimeInterval(1)))
+    }
+
+    func testSeededThenLaterTransitionDoesNotify() {
+        var p = NotificationPolicy()
+        p.seed(sessionID: "s", state: .working)
+        XCTAssertTrue(p.shouldNotify(sessionID: "s", newState: .waitingForInput,
+                                     now: t0.addingTimeInterval(1)))
+    }
 }

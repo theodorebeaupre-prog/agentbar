@@ -11,6 +11,7 @@ extension Notification.Name {
 final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
     private var policy = NotificationPolicy()
     private var authorized = false
+    private var hasSeeded = false
 
     override init() {
         super.init()
@@ -23,6 +24,18 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
 
     func process(_ snapshots: [SessionSnapshot]) {
         let now = Date()
+        // The first batch this instance ever sees is treated as a baseline, not
+        // a burst of transitions: at app launch, every already-waiting session
+        // would otherwise look like a fresh nil -> waitingForInput transition
+        // and fire a notification for work that isn't new. Seed silently, then
+        // let subsequent batches notify on genuine transitions as usual.
+        guard hasSeeded else {
+            hasSeeded = true
+            for snap in snapshots {
+                policy.seed(sessionID: snap.session.id, state: snap.state)
+            }
+            return
+        }
         for snap in snapshots {
             guard policy.shouldNotify(sessionID: snap.session.id,
                                       newState: snap.state, now: now) else { continue }
