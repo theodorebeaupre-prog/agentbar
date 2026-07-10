@@ -21,10 +21,12 @@ public struct AuditInventory {
                                        sourcePath: url.path, content: content))
             }
         }
-        let settings = home.appendingPathComponent(".claude/settings.json")
-        if let content = try? String(contentsOf: settings, encoding: .utf8) {
-            items.append(AuditItem(name: ".claude/settings.json", kind: .hook,
-                                   sourcePath: settings.path, content: content))
+        for rel in [".claude/settings.json", ".claude/settings.local.json"] {
+            let settings = home.appendingPathComponent(rel)
+            if let content = try? String(contentsOf: settings, encoding: .utf8) {
+                items.append(AuditItem(name: rel, kind: .hook,
+                                       sourcePath: settings.path, content: content))
+            }
         }
         return items
     }

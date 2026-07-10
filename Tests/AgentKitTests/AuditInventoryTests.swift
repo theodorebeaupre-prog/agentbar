@@ -92,4 +92,17 @@ final class AuditInventoryTests: XCTestCase {
             $0.kind == .hook && $0.name == ".claude/settings.json"
         })
     }
+
+    func testClaudeSettingsLocalCollectedAsHook() throws {
+        let home = try makeFullFakeHome()
+        let claudeDir = home.appendingPathComponent(".claude")
+        try #"{"hooks":{"PostToolUse":[]}}"#.write(
+            to: claudeDir.appendingPathComponent("settings.local.json"),
+            atomically: true, encoding: .utf8)
+
+        let items = AuditInventory(home: home).collect()
+        XCTAssertTrue(items.contains {
+            $0.kind == .hook && $0.name == ".claude/settings.local.json"
+        })
+    }
 }
