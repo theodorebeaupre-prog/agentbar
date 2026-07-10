@@ -44,11 +44,20 @@ public final class SessionWatcher: @unchecked Sendable {
                 self.continuations[id] = continuation
                 self.startIfNeeded()
                 let snaps = self.computeSnapshots() // immediate first value
-                self.lastEmitted = snaps
+                // Deliberately do NOT touch lastEmitted here: refresh() is the
+                // sole owner of the dedup baseline. A subscriber may see the
+                // same snapshot array twice (this immediate yield + the next
+                // refresh()) — harmless. Writing lastEmitted here instead can
+                // let a late-subscribing observer's recompute overwrite the
+                // baseline before a pending debounced refresh() fires,
+                // causing that refresh() to see snaps == lastEmitted and
+                // silently drop a transition for already-subscribed
+                // observers. Duplicate equal values are harmless; dropped
+                // transitions are not.
                 continuation.yield(snaps)
             }
             continuation.onTermination = { [weak self] _ in
-                self?.queue.async { self?.continuations[id] = nil }
+                self?.queue.async { [weak self] in self?.continuations[id] = nil }
             }
         }
     }
