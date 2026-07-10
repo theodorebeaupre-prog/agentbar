@@ -1,0 +1,25 @@
+name: AgentBar
+options:
+  bundleIdPrefix: com.theodorebeaupre
+  deploymentTarget:
+    macOS: "14.0"
+packages:
+  AgentBarPackage:
+    path: ..
+targets:
+  AgentBar:
+    type: application
+    platform: macOS
+    sources: [Sources]
+    dependencies:
+      - package: AgentBarPackage
+        product: AgentKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.theodorebeaupre.agentbar
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Théodore Beaupré — MIT"
+        ENABLE_APP_SANDBOX: NO
