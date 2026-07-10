@@ -95,7 +95,11 @@ struct Audit: ParsableCommand {
                 ["rule": f.ruleID, "severity": f.severity.rawValue, "title": f.title,
                  "item": f.itemName, "excerpt": f.excerpt, "explanation": f.explanation]
             }
-            let data = try JSONSerialization.data(withJSONObject: objs,
+            let result: [String: Any] = [
+                "disclaimer": AuditEngine.disclaimer,
+                "findings": objs
+            ]
+            let data = try JSONSerialization.data(withJSONObject: result,
                                                   options: [.prettyPrinted])
             print(String(data: data, encoding: .utf8)!)
         } else {
