@@ -39,7 +39,9 @@ public enum TextRendering {
 
     public static func timelineText(_ entries: [TimelineEntry]) -> String {
         guard !entries.isEmpty else { return "Empty session." }
-        let df = DateFormatter(); df.dateFormat = "HH:mm:ss"
+        let df = DateFormatter()
+        df.locale = Locale(identifier: "en_US_POSIX")
+        df.dateFormat = "HH:mm:ss"
         return entries.map { e in
             let gap = e.elapsed.map { $0 >= 1 ? String(format: " (+%.0fs)", $0) : "" } ?? ""
             let body: String

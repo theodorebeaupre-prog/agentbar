@@ -36,7 +36,10 @@ AgentBar tails the JSONL transcripts both CLIs already write
 finished assistant turn is *waiting for you*; recent tool activity means
 *working*; silence means *idle*. Zero configuration, no hooks, no wrappers —
 and if the transcript format drifts, unknown records degrade gracefully
-instead of breaking.
+instead of breaking. This is heuristic, not exact: a session blocked on a
+permission prompt currently reads as *working*, and a finished-but-closed
+session reads as *waiting* until the idle gate kicks in. A precise
+hook-based signal is planned for v0.2.
 
 ## License
 
