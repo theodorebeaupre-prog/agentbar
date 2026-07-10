@@ -12,10 +12,12 @@
 		A8C519877FACB6CD2FE5894A /* LiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52205F239B113F186EC384B7 /* LiveView.swift */; };
 		AB2D704957F73F13256FECAA /* AgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB4DDD2A93C84CF6E0626C5A /* AgentKit */; };
 		B3852F251393CD405C85610B /* SessionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0469950F51798C0F9C740EFD /* SessionRow.swift */; };
+		D9A0482768C319701BB623DC /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB42A83424D29E3582645FE /* NotificationManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0469950F51798C0F9C740EFD /* SessionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRow.swift; sourceTree = "<group>"; };
+		0CB42A83424D29E3582645FE /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		2B97C58A669DB6ABA171CEB0 /* AgentBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBarApp.swift; sourceTree = "<group>"; };
 		52205F239B113F186EC384B7 /* LiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveView.swift; sourceTree = "<group>"; };
 		77DF56A57A96571BDFA76181 /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
@@ -57,6 +59,7 @@
 			children = (
 				2B97C58A669DB6ABA171CEB0 /* AgentBarApp.swift */,
 				52205F239B113F186EC384B7 /* LiveView.swift */,
+				0CB42A83424D29E3582645FE /* NotificationManager.swift */,
 				0469950F51798C0F9C740EFD /* SessionRow.swift */,
 				77DF56A57A96571BDFA76181 /* SessionStore.swift */,
 			);
@@ -133,6 +136,7 @@
 			files = (
 				11AECCD16F5C0A98215D7404 /* AgentBarApp.swift in Sources */,
 				A8C519877FACB6CD2FE5894A /* LiveView.swift in Sources */,
+				D9A0482768C319701BB623DC /* NotificationManager.swift in Sources */,
 				B3852F251393CD405C85610B /* SessionRow.swift in Sources */,
 				5D8D25E88840E19270DEC096 /* SessionStore.swift in Sources */,
 			);

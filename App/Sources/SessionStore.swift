@@ -7,6 +7,7 @@ final class SessionStore: ObservableObject {
     var waitingCount: Int { snapshots.filter { $0.state == .waitingForInput }.count }
 
     private let watcher = SessionWatcher(discovery: SessionDiscovery())
+    private let notifications = NotificationManager()
     private var task: Task<Void, Never>?
 
     init() {
@@ -14,6 +15,7 @@ final class SessionStore: ObservableObject {
             guard let stream = self?.watcher.snapshots() else { return }
             for await snaps in stream {
                 self?.snapshots = snaps
+                self?.notifications.process(snaps)
             }
         }
     }
