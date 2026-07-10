@@ -46,13 +46,14 @@ public enum CodexParser {
         case "function_call", "custom_tool_call":
             let name = (payload["name"] as? String) ?? "?"
             return .assistantMessage(text: "", toolUses: [ToolUse(name: name)])
-        case "user_message":
-            // event_msg-level echo of the user's turn (flat "message" field,
-            // distinct from the response_item "message" block shape above).
-            return .userMessage((payload["message"] as? String) ?? "")
-        case "agent_message":
-            // event_msg-level echo of the assistant's turn commentary.
-            return .assistantMessage(text: (payload["message"] as? String) ?? "", toolUses: [])
+        case "user_message", "agent_message":
+            // event_msg-level echoes of turns already recorded as
+            // response_item/"message" (verified across 52 real rollouts on
+            // 2026-07-10: every user_message and 3043/3046 agent_messages had
+            // a response_item twin; the 3 exceptions were interim "commentary"
+            // in aborted sessions). response_item is the canonical channel;
+            // mapping these echoes to .meta avoids double-counting every turn.
+            return .meta
         default:
             // Includes reasoning, function_call_output, custom_tool_call_output,
             // token_count, task_started/task_complete, patch_apply_end, and any

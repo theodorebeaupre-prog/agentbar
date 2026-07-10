@@ -16,11 +16,11 @@ final class CodexParserTests: XCTestCase {
 
         // Types found in a real ~/.codex/sessions rollout (2026-07-10) not
         // present in the original fixture; anonymized samples added below.
-        XCTAssertEqual(parsed.events[4].kind,
-                       .userMessage("Now add a test for the fix.")) // event_msg/user_message
-        XCTAssertEqual(parsed.events[5].kind,
-                       .assistantMessage(text: "Sure, adding a regression test now.",
-                                          toolUses: [])) // event_msg/agent_message
+        // event_msg user_message/agent_message are echoes of turns already
+        // carried by response_item/message (the canonical channel), so they map
+        // to .meta — otherwise replay would show every prompt/response twice.
+        XCTAssertEqual(parsed.events[4].kind, .meta) // event_msg/user_message
+        XCTAssertEqual(parsed.events[5].kind, .meta) // event_msg/agent_message
         XCTAssertEqual(parsed.events[6].kind,
                        .assistantMessage(text: "",
                                           toolUses: [ToolUse(name: "apply_patch")])) // custom_tool_call
