@@ -41,8 +41,8 @@ final class SessionDiscoveryTests: XCTestCase {
 
     func testParseAllModifiedWithinCutoffExcludesOldFiles() throws {
         let home = try makeFakeHome()
-        // Find and backdate one of the session files.
-        let sessionFile = FileManager.default.enumerator(
+        // Find all session files.
+        let sessionFiles = FileManager.default.enumerator(
             at: home,
             includingPropertiesForKeys: [.isRegularFileKey]
         )?.compactMap { item -> URL? in
@@ -51,17 +51,23 @@ final class SessionDiscoveryTests: XCTestCase {
                   let isRegular = try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile,
                   isRegular else { return nil }
             return url
-        }.first
+        }.sorted { $0.path < $1.path } ?? []
 
-        guard let fileToBackdate = sessionFile else {
-            XCTFail("No .jsonl file found in fake home")
+        guard sessionFiles.count >= 2 else {
+            XCTFail("Expected at least 2 .jsonl files in fake home")
             return
         }
 
         // Backdate one file to 2 hours in the past.
         try FileManager.default.setAttributes(
             [.modificationDate: Date(timeIntervalSinceNow: -7200)],
-            ofItemAtPath: fileToBackdate.path
+            ofItemAtPath: sessionFiles[0].path
+        )
+
+        // Pin the other file to now.
+        try FileManager.default.setAttributes(
+            [.modificationDate: Date()],
+            ofItemAtPath: sessionFiles[1].path
         )
 
         let d = SessionDiscovery(home: home)
