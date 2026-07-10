@@ -1,0 +1,17 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+jobs:
+  test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift tests (AgentKit + CLI)
+        run: swift test
+      - name: Build app
+        run: |
+          brew install xcodegen
+          cd App && xcodegen
+          xcodebuild -project AgentBar.xcodeproj -scheme AgentBar \
+            -configuration Release build CODE_SIGNING_ALLOWED=NO

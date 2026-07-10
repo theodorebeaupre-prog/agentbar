@@ -1,0 +1,194 @@
+name: Release
+
+# Builds, signs (Developer ID), notarizes, staples, and publishes AgentBar
+# (app + CLI in one bundle) when a version tag is pushed, then opens a PR
+# bumping the Homebrew cask in the tap repo.
+#
+# Adapted from PhotoCull's release.yml (../PhotoCull/.github/workflows/release.yml).
+# Signing is OPTIONAL: when the secrets below are not configured (e.g. forks,
+# or before an Apple Developer membership exists), the workflow still publishes
+# an ad-hoc-signed build, with a Gatekeeper note in the release.
+#
+# Repository secrets for signed releases (same names/values as PhotoCull —
+# already exist at the account level):
+#   BUILD_CERTIFICATE_BASE64   Developer ID Application certificate (.p12, base64)
+#   P12_PASSWORD               password of that .p12
+#   KEYCHAIN_PASSWORD          any random string (protects the temp CI keychain)
+#   APPLE_ID                   Apple ID used for notarization
+#   APPLE_TEAM_ID              10-character team identifier
+#   APP_SPECIFIC_PASSWORD      app-specific password for notarytool
+#   CODE_SIGN_IDENTITY_NAME    e.g. "Developer ID Application: Jane Doe (TEAMID1234)"
+#
+# New secret, not part of PhotoCull's pipeline (PhotoCull does not bump a
+# cask automatically — see release notes in the task-16 report):
+#   HOMEBREW_TAP_TOKEN         PAT with push access to
+#                              theodorebeaupre-prog/homebrew-tap, used only
+#                              for the cask-bump PR step below.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build, sign if possible & publish
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: cd App && xcodegen generate
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build CLI (release)
+        run: swift build -c release
+
+      - name: Check signing availability
+        id: signing
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        run: |
+          if [ -n "$BUILD_CERTIFICATE_BASE64" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No signing certificate configured — publishing an unsigned build."
+          fi
+
+      - name: Import signing certificate
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          CERT_PATH="$RUNNER_TEMP/certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERT_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERT_PATH" -P "$P12_PASSWORD" -A \
+            -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain
+
+      # Built ad-hoc/unsigned regardless of signing availability: the CLI
+      # binary still needs to be embedded (next step) before any real
+      # signature is applied, since adding a file to an already-signed
+      # bundle invalidates its seal. Real Developer ID signing (or a fresh
+      # ad-hoc re-sign) happens explicitly after embedding.
+      - name: Build app
+        run: |
+          cd App
+          xcodebuild -project AgentBar.xcodeproj -scheme AgentBar \
+            -configuration Release -derivedDataPath build \
+            CODE_SIGN_IDENTITY=- CODE_SIGNING_ALLOWED=YES \
+            build
+
+      - name: Embed CLI in app bundle
+        run: |
+          APP="App/build/Build/Products/Release/AgentBar.app"
+          cp .build/release/agentbar "$APP/Contents/MacOS/agentbar"
+          chmod +x "$APP/Contents/MacOS/agentbar"
+
+      - name: Sign app (Developer ID)
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          CODE_SIGN_IDENTITY_NAME: ${{ secrets.CODE_SIGN_IDENTITY_NAME }}
+        run: |
+          APP="App/build/Build/Products/Release/AgentBar.app"
+          codesign --force --options runtime --timestamp \
+            --sign "$CODE_SIGN_IDENTITY_NAME" "$APP/Contents/MacOS/agentbar"
+          codesign --force --options runtime --timestamp \
+            --sign "$CODE_SIGN_IDENTITY_NAME" "$APP"
+
+      - name: Sign app (ad-hoc)
+        if: steps.signing.outputs.enabled == 'false'
+        run: |
+          APP="App/build/Build/Products/Release/AgentBar.app"
+          codesign --force --sign - "$APP/Contents/MacOS/agentbar"
+          codesign --force --sign - "$APP"
+
+      - name: Notarize and staple
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        run: |
+          APP="App/build/Build/Products/Release/AgentBar.app"
+          ditto -c -k --keepParent "$APP" notarize.zip
+          xcrun notarytool submit notarize.zip \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APP_SPECIFIC_PASSWORD" \
+            --wait
+          xcrun stapler staple "$APP"
+
+      - name: Zip app
+        run: |
+          ditto -c -k --keepParent \
+            "App/build/Build/Products/Release/AgentBar.app" \
+            "AgentBar-${GITHUB_REF_NAME}.zip"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGNED: ${{ steps.signing.outputs.enabled }}
+        run: |
+          NOTES=""
+          if [ "$SIGNED" = "false" ]; then
+            NOTES="> [!NOTE]
+          > This build is not code-signed or notarized. On first launch, right-click **AgentBar.app** and choose **Open**, or allow it under *System Settings → Privacy & Security*."
+          fi
+          gh release create "$GITHUB_REF_NAME" \
+            "AgentBar-${GITHUB_REF_NAME}.zip" \
+            --title "AgentBar $GITHUB_REF_NAME" \
+            --generate-notes \
+            --notes "$NOTES"
+
+      - name: Bump Homebrew cask
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::HOMEBREW_TAP_TOKEN not set — skipping cask bump PR. Update theodorebeaupre-prog/homebrew-tap manually."
+            exit 0
+          fi
+
+          VERSION="${GITHUB_REF_NAME#v}"
+          SHA256=$(shasum -a 256 "AgentBar-${GITHUB_REF_NAME}.zip" | awk '{print $1}')
+
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/theodorebeaupre-prog/homebrew-tap.git" tap
+          cd tap
+
+          CASK_FILE="Casks/agentbar.rb"
+          sed -i '' "s/version \".*\"/version \"${VERSION}\"/" "$CASK_FILE"
+          sed -i '' "s/sha256 \".*\"/sha256 \"${SHA256}\"/" "$CASK_FILE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          BRANCH="bump-agentbar-${VERSION}"
+          git checkout -b "$BRANCH"
+          git add "$CASK_FILE"
+          git commit -m "agentbar ${VERSION}"
+          git push origin "$BRANCH"
+
+          gh pr create \
+            --repo theodorebeaupre-prog/homebrew-tap \
+            --title "agentbar ${VERSION}" \
+            --body "Bumps agentbar to ${VERSION} (sha256 ${SHA256}), auto-generated by the AgentBar release workflow." \
+            --head "$BRANCH" \
+            --base main
