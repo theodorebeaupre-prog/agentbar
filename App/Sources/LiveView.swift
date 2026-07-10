@@ -25,9 +25,6 @@ struct LiveMenuContent: View {
             }.padding(.horizontal, 12).padding(.bottom, 8)
         }
         .frame(width: 340)
-        .onReceive(NotificationCenter.default.publisher(for: .agentBarOpenMainWindow)) { _ in
-            openWindow(id: "main")
-        }
     }
 
     /// Waiting sessions pinned to the top (spec).

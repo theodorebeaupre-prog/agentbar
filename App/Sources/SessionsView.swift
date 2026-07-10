@@ -4,6 +4,7 @@ import AgentKit
 struct SessionsView: View {
     @State private var parsed: [ParsedSession] = []
     @State private var selected: String?
+    @State private var loadTask: Task<Void, Never>?
 
     var body: some View {
         HSplitView {
@@ -38,12 +39,23 @@ struct SessionsView: View {
             // UI for the duration of the parse. Do the heavy synchronous work in a
             // detached, non-actor-isolated task, then hop back to the main actor
             // only to publish the result.
-            let sorted = await Task.detached(priority: .userInitiated) { () -> [ParsedSession] in
-                SessionDiscovery().parseAll(modifiedWithin: nil)
+            //
+            // Guard against re-selecting the Sessions tab (which spawns a fresh
+            // view identity and re-runs `.task`) stacking a second multi-minute
+            // scan on top of one already in flight.
+            guard loadTask == nil else { return }
+            loadTask = Task.detached(priority: .userInitiated) {
+                let sorted = SessionDiscovery().parseAll(modifiedWithin: nil)
                     .sorted { ($0.session.lastEventAt ?? .distantPast)
                             > ($1.session.lastEventAt ?? .distantPast) }
-            }.value
-            await MainActor.run { parsed = sorted }
+                guard !Task.isCancelled else { return }
+                await MainActor.run { parsed = sorted }
+            }
+            await loadTask?.value
+        }
+        .onDisappear {
+            loadTask?.cancel()
+            loadTask = nil
         }
     }
 }
