@@ -5,18 +5,26 @@ struct SessionsView: View {
     @State private var parsed: [ParsedSession] = []
     @State private var selected: String?
     @State private var loadTask: Task<Void, Never>?
+    @State private var isLoading = true
 
     var body: some View {
         HSplitView {
-            List(parsed, id: \.session.id, selection: $selected) { p in
-                VStack(alignment: .leading) {
-                    Text(p.session.projectName).fontWeight(.medium)
-                    Text(p.session.title ?? p.session.provider.displayName)
-                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                    Text(TextRendering.relative(p.session.lastEventAt))
-                        .font(.caption2).foregroundStyle(.tertiary)
-                }.tag(p.session.id)
-            }.frame(minWidth: 220, maxWidth: 300)
+            Group {
+                if isLoading {
+                    ProgressView("Indexing session history…")
+                        .frame(minWidth: 220, maxWidth: 300, maxHeight: .infinity)
+                } else {
+                    List(parsed, id: \.session.id, selection: $selected) { p in
+                        VStack(alignment: .leading) {
+                            Text(p.session.projectName).fontWeight(.medium)
+                            Text(p.session.title ?? p.session.provider.displayName)
+                                .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                            Text(TextRendering.relative(p.session.lastEventAt))
+                                .font(.caption2).foregroundStyle(.tertiary)
+                        }.tag(p.session.id)
+                    }.frame(minWidth: 220, maxWidth: 300)
+                }
+            }
 
             ScrollView {
                 if let p = parsed.first(where: { $0.session.id == selected }) {
@@ -49,7 +57,10 @@ struct SessionsView: View {
                     .sorted { ($0.session.lastEventAt ?? .distantPast)
                             > ($1.session.lastEventAt ?? .distantPast) }
                 guard !Task.isCancelled else { return }
-                await MainActor.run { parsed = sorted }
+                await MainActor.run {
+                    parsed = sorted
+                    isLoading = false
+                }
             }
             await loadTask?.value
         }
