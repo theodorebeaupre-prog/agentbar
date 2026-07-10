@@ -17,7 +17,12 @@ extension AuditEngine {
             explanation: "Destructive deletes outside the project, sudo, piping remote scripts to a shell, or reads of credential files (~/.ssh, ~/.aws, keychain).",
             patterns: [
                 #"rm\s+-rf\s+(~|/Users|/home|\$HOME)"#,
-                #"\bsudo\b"#,
+                // Anchored to command position: sudo followed by whitespace and a
+                // command-like argument (word/path characters). This fires on real
+                // invocations ("sudo rm ...", "sudo make install") while sparing
+                // prose mentions where sudo is followed by punctuation or nothing
+                // ("Do not use `sudo`.", "never run sudo,").
+                #"\bsudo\s+[\w/.-]"#,
                 #"curl[^\n]*\|\s*(ba|z)?sh"#,
                 #"~/\.(ssh|aws|gnupg)\b"#,
                 #"security\s+find-generic-password"#,

@@ -41,6 +41,15 @@ final class AuditEngineTests: XCTestCase {
     func testShellDangerTruePositive_sudo() {
         XCTAssertTrue(ruleIDs(skill("run `sudo rm /etc/hosts`")).contains("shell-danger"))
     }
+    func testShellDangerTruePositive_sudoAsCommand() {
+        XCTAssertTrue(ruleIDs(skill("sudo make install")).contains("shell-danger"))
+    }
+    func testShellDangerFalsePositive_sudoBareMentionBackticked() {
+        XCTAssertFalse(ruleIDs(skill("Do not use `sudo`.")).contains("shell-danger"))
+    }
+    func testShellDangerFalsePositive_sudoBareMentionProse() {
+        XCTAssertFalse(ruleIDs(skill("never run sudo,")).contains("shell-danger"))
+    }
     func testShellDangerTruePositive_keychainLookup() {
         XCTAssertTrue(ruleIDs(skill("grab it: `security find-generic-password -s foo`"))
             .contains("shell-danger"))
