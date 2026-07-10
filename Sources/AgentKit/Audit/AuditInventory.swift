@@ -29,18 +29,50 @@ public struct AuditInventory {
         return items
     }
 
+    /// Enumerates SKILL.md files under `root`. Passes an explicit errorHandler
+    /// that skips unreadable entries and keeps walking, rather than letting the
+    /// default (nil) behavior silently abort the remaining traversal: an audit
+    /// reports what it CAN see, not a truncated view masquerading as complete.
     private func skillItems(under root: URL, namePrefix: String) -> [AuditItem] {
         guard let e = FileManager.default.enumerator(
-            at: root, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles])
+            at: root, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles],
+            errorHandler: { _, _ in true })
         else { return [] }
         var out: [AuditItem] = []
         for case let url as URL in e {
             guard url.lastPathComponent == "SKILL.md" else { continue }
             guard let content = try? String(contentsOf: url, encoding: .utf8) else { continue }
-            let name = namePrefix + url.deletingLastPathComponent().lastPathComponent
+            let dir = url.deletingLastPathComponent()
+            let name = namePrefix.isEmpty
+                ? dir.lastPathComponent
+                : namePrefix + pluginSkillName(dir: dir, root: root)
             out.append(AuditItem(name: name, kind: .skill,
                                  sourcePath: url.path, content: content))
         }
         return out
+    }
+
+    /// Names a plugin skill `<plugin>/<skill-dir-name>` so that skills with the
+    /// same directory name in different plugins don't collide and the plugin
+    /// identity is preserved. Computed from the SKILL.md directory's path
+    /// relative to the enumeration root (the plugin cache dir).
+    ///
+    /// The cache layout is `<marketplace>/<plugin>/<version>/skills/<skill>`,
+    /// so when a `skills` component is present, the plugin id is the component
+    /// two before it (the component immediately before `skills` is the version
+    /// directory). Unknown/shallower layouts fall back to joining every
+    /// relative directory component with "/" — not as readable, but always
+    /// unambiguous.
+    private func pluginSkillName(dir: URL, root: URL) -> String {
+        let rootComponents = root.standardizedFileURL.pathComponents
+        let dirComponents = dir.standardizedFileURL.pathComponents
+        let relative = Array(dirComponents.dropFirst(rootComponents.count))
+        if let skillsIndex = relative.firstIndex(of: "skills"),
+           skillsIndex >= 2,
+           let skillDirName = relative.last {
+            let plugin = relative[skillsIndex - 2]
+            return "\(plugin)/\(skillDirName)"
+        }
+        return relative.joined(separator: "/")
     }
 }

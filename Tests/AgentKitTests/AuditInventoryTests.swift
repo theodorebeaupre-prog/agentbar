@@ -33,4 +33,63 @@ final class AuditInventoryTests: XCTestCase {
         let findings = AuditEngine.scan(items)
         XCTAssertTrue(findings.contains { $0.ruleID == "unpinned-source" })
     }
+
+    /// A second fixture builder covering the collection behaviors not touched
+    /// by `makeFakeHome()`: two same-named plugin skills from different
+    /// plugins, a Codex MCP config, and Claude hook settings.
+    func makeFullFakeHome() throws -> URL {
+        let home = FileManager.default.temporaryDirectory
+            .appendingPathComponent("audithome-full-" + UUID().uuidString)
+        let fm = FileManager.default
+
+        let toolkitSkill = home.appendingPathComponent(
+            ".claude/plugins/cache/marketplace/toolkit/1.0.0/skills/review")
+        try fm.createDirectory(at: toolkitSkill, withIntermediateDirectories: true)
+        try "# Review\nToolkit's review skill.".write(
+            to: toolkitSkill.appendingPathComponent("SKILL.md"), atomically: true, encoding: .utf8)
+
+        let otherSkill = home.appendingPathComponent(
+            ".claude/plugins/cache/marketplace/other/2.0.0/skills/review")
+        try fm.createDirectory(at: otherSkill, withIntermediateDirectories: true)
+        try "# Review\nOther's review skill.".write(
+            to: otherSkill.appendingPathComponent("SKILL.md"), atomically: true, encoding: .utf8)
+
+        let codexDir = home.appendingPathComponent(".codex")
+        try fm.createDirectory(at: codexDir, withIntermediateDirectories: true)
+        try "[mcp_servers.x]\ncommand = \"npx\"\n".write(
+            to: codexDir.appendingPathComponent("config.toml"), atomically: true, encoding: .utf8)
+
+        let claudeDir = home.appendingPathComponent(".claude")
+        try fm.createDirectory(at: claudeDir, withIntermediateDirectories: true)
+        try #"{"hooks":{"PreToolUse":[]}}"#.write(
+            to: claudeDir.appendingPathComponent("settings.json"), atomically: true, encoding: .utf8)
+
+        return home
+    }
+
+    func testPluginSkillsAreQualifiedByPluginAndDistinct() throws {
+        let items = AuditInventory(home: try makeFullFakeHome()).collect()
+        let toolkitReview = items.first { $0.name == "plugin:toolkit/review" }
+        let otherReview = items.first { $0.name == "plugin:other/review" }
+
+        XCTAssertNotNil(toolkitReview)
+        XCTAssertNotNil(otherReview)
+        XCTAssertEqual(toolkitReview?.kind, .skill)
+        XCTAssertEqual(otherReview?.kind, .skill)
+        XCTAssertNotEqual(toolkitReview?.sourcePath, otherReview?.sourcePath)
+    }
+
+    func testCodexConfigCollectedAsMcpServer() throws {
+        let items = AuditInventory(home: try makeFullFakeHome()).collect()
+        XCTAssertTrue(items.contains {
+            $0.kind == .mcpServer && $0.name == ".codex/config.toml"
+        })
+    }
+
+    func testClaudeSettingsCollectedAsHook() throws {
+        let items = AuditInventory(home: try makeFullFakeHome()).collect()
+        XCTAssertTrue(items.contains {
+            $0.kind == .hook && $0.name == ".claude/settings.json"
+        })
+    }
 }
