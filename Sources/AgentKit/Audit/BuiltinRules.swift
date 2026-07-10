@@ -7,8 +7,8 @@ extension AuditEngine {
             title: "Sends data to a remote host",
             explanation: "Instructions tell the agent to POST/upload data to a non-local URL. Combined with file reads this is an exfiltration path.",
             patterns: [
-                #"(curl|wget)\s+[^\n|;]*(-X\s*POST|--data|-d\s|--upload-file|-T\s)[^\n]*https?://(?!localhost|127\.0\.0\.1|0\.0\.0\.0)"#,
-                #"(curl|wget)\s+[^\n]*https?://(?!localhost|127\.0\.0\.1|0\.0\.0\.0)[^\n]*(-d\s*@|--data\s*@)"#,
+                #"(curl|wget)\s+[^\n|;]*(-X\s*POST|--data|-d\s|--upload-file|-T\s)[^\n]*https?://(?!(localhost|127\.0\.0\.1|0\.0\.0\.0)([:/]|$))"#,
+                #"(curl|wget)\s+[^\n]*https?://(?!(localhost|127\.0\.0\.1|0\.0\.0\.0)([:/]|$))[^\n]*(-d\s*@|--data\s*@)"#,
             ],
             appliesTo: nil),
         AuditRule(
