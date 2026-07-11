@@ -4,7 +4,9 @@ on:
   pull_request:
 jobs:
   test:
-    runs-on: macos-14
+    # macos-15 to match release.yml: current xcodegen emits project format 77,
+    # which macos-14's Xcode 15.4 cannot read.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: Swift tests (AgentKit + CLI)
