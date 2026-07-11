@@ -1,12 +1,16 @@
 # AgentBar
 
+[![CI](https://github.com/theodorebeaupre-prog/agentbar/actions/workflows/ci.yml/badge.svg)](https://github.com/theodorebeaupre-prog/agentbar/actions/workflows/ci.yml)
+[![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue)](#install)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 **Mission control for your coding agents. Native, free, 100% local.**
 
 You run three Claude Code sessions and a Codex session across four terminals.
 One of them has been waiting for your answer for 20 minutes. AgentBar is the
 macOS menu bar app that makes that impossible:
 
-![AgentBar demo](docs/demo.gif)
+<!-- TODO(launch): hero GIF — docs/demo.gif (badge flips to 1, notification slides in, click, orange WAITING row) -->
 
 - ⚡ **Live status** of every Claude Code / Codex session — working, waiting
   for you, idle — straight from the menu bar
@@ -22,12 +26,34 @@ macOS menu bar app that makes that impossible:
 
 ## Install
 
+Requires macOS 14 (Sonoma) or later.
+
 ```sh
 brew install --cask theodorebeaupre-prog/tap/agentbar
 ```
 
-Ships with a CLI too: `agentbar status | watch | replay | audit`.
-`agentbar audit` exits 1 on red findings — CI-friendly.
+Or build from source:
+
+```sh
+git clone https://github.com/theodorebeaupre-prog/agentbar.git
+cd agentbar
+swift build -c release            # CLI → .build/release/agentbar
+cd App && xcodegen && xcodebuild -scheme AgentBar -configuration Release build
+```
+
+## CLI
+
+One cask installs both the app and the `agentbar` CLI:
+
+```sh
+agentbar            # status table of all current sessions (default)
+agentbar watch      # live-updating status, Ctrl-C to exit
+agentbar replay     # timeline of the most recent session; --json for scripting
+agentbar audit      # scan installed skills/MCP configs; exits 1 on red findings
+```
+
+`agentbar audit` is CI-friendly: wire it into a pipeline and fail the build
+when a red finding appears.
 
 ## How state detection works
 
