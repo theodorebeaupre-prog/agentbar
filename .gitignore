@@ -4,3 +4,6 @@
 !App/AgentBar.xcodeproj
 DerivedData/
 App/build/
+xcuserdata/
+*.xcuserstate
+.swiftpm/
