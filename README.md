@@ -69,4 +69,4 @@ hook-based signal is planned for v0.2.
 
 ## License
 
-MIT — © 2026 Théodore Beaupré
+MIT — © 2026 ISO NORD CA

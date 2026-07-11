@@ -21,5 +21,5 @@ targets:
         CURRENT_PROJECT_VERSION: 1
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_LSUIElement: YES
-        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Théodore Beaupré — MIT"
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 ISO NORD CA — MIT"
         ENABLE_APP_SANDBOX: NO
