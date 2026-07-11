@@ -10,7 +10,7 @@ You run three Claude Code sessions and a Codex session across four terminals.
 One of them has been waiting for your answer for 20 minutes. AgentBar is the
 macOS menu bar app that makes that impossible:
 
-<!-- TODO(launch): hero GIF — docs/demo.gif (badge flips to 1, notification slides in, click, orange WAITING row) -->
+![AgentBar demo — live session status in the menu bar, waiting sessions pinned on top](docs/demo.gif)
 
 - ⚡ **Live status** of every Claude Code / Codex session — working, waiting
   for you, idle — straight from the menu bar
