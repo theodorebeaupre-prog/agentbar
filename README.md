@@ -12,6 +12,8 @@ macOS menu bar app that makes that impossible:
 
 ![AgentBar demo — live session status in the menu bar, waiting sessions pinned on top](docs/demo.gif)
 
+> 🛠️ Shipping solo with AI? The **Ship Kit** packs 3 premium Claude Code skills, proven config templates, and a zero-budget launch playbook → https://isonord.gumroad.com/l/qblnuh
+
 - ⚡ **Live status** of every Claude Code / Codex session — working, waiting
   for you, idle — straight from the menu bar
 - 🔔 **Native notification** the moment an agent needs your input
