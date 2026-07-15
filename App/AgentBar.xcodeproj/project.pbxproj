@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		11AECCD16F5C0A98215D7404 /* AgentBarApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B97C58A669DB6ABA171CEB0 /* AgentBarApp.swift */; };
+		AA0000000000000000000001 /* AskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000002 /* AskView.swift */; };
+		AA0000000000000000000003 /* ClaudeRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000004 /* ClaudeRunner.swift */; };
+		AA0000000000000000000005 /* SessionReplyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000006 /* SessionReplyView.swift */; };
 		5D8D25E88840E19270DEC096 /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DF56A57A96571BDFA76181 /* SessionStore.swift */; };
 		A8C519877FACB6CD2FE5894A /* LiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52205F239B113F186EC384B7 /* LiveView.swift */; };
 		AB2D704957F73F13256FECAA /* AgentKit in Frameworks */ = {isa = PBXBuildFile; productRef = BB4DDD2A93C84CF6E0626C5A /* AgentKit */; };
@@ -20,6 +23,9 @@
 
 /* Begin PBXFileReference section */
 		0469950F51798C0F9C740EFD /* SessionRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRow.swift; sourceTree = "<group>"; };
+		AA0000000000000000000002 /* AskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AskView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000004 /* ClaudeRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeRunner.swift; sourceTree = "<group>"; };
+		AA0000000000000000000006 /* SessionReplyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionReplyView.swift; sourceTree = "<group>"; };
 		0CB42A83424D29E3582645FE /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		2020AB19A0D88DCA3D2D4436 /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
 		2B97C58A669DB6ABA171CEB0 /* AgentBarApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentBarApp.swift; sourceTree = "<group>"; };
@@ -64,10 +70,13 @@
 			isa = PBXGroup;
 			children = (
 				2B97C58A669DB6ABA171CEB0 /* AgentBarApp.swift */,
+				AA0000000000000000000002 /* AskView.swift */,
 				A347617071A4EDA33014833C /* AuditView.swift */,
+				AA0000000000000000000004 /* ClaudeRunner.swift */,
 				52205F239B113F186EC384B7 /* LiveView.swift */,
 				2020AB19A0D88DCA3D2D4436 /* MainWindow.swift */,
 				0CB42A83424D29E3582645FE /* NotificationManager.swift */,
+				AA0000000000000000000006 /* SessionReplyView.swift */,
 				0469950F51798C0F9C740EFD /* SessionRow.swift */,
 				77DF56A57A96571BDFA76181 /* SessionStore.swift */,
 				B1D5BCBB54C6C1758CC40F40 /* SessionsView.swift */,
@@ -144,10 +153,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				11AECCD16F5C0A98215D7404 /* AgentBarApp.swift in Sources */,
+				AA0000000000000000000001 /* AskView.swift in Sources */,
 				C6F306CEA6585F1CBF35B4D0 /* AuditView.swift in Sources */,
+				AA0000000000000000000003 /* ClaudeRunner.swift in Sources */,
 				A8C519877FACB6CD2FE5894A /* LiveView.swift in Sources */,
 				E7581B86665A6CD4158A00C1 /* MainWindow.swift in Sources */,
 				D9A0482768C319701BB623DC /* NotificationManager.swift in Sources */,
+				AA0000000000000000000005 /* SessionReplyView.swift in Sources */,
 				B3852F251393CD405C85610B /* SessionRow.swift in Sources */,
 				5D8D25E88840E19270DEC096 /* SessionStore.swift in Sources */,
 				DB31F7B5621DA0181E0C5087 /* SessionsView.swift in Sources */,
@@ -227,7 +239,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.theodorebeaupre.agentbar;
 				SDKROOT = macosx;
 			};
@@ -247,7 +259,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.theodorebeaupre.agentbar;
 				SDKROOT = macosx;
 			};
