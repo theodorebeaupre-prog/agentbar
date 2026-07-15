@@ -17,14 +17,23 @@ macOS menu bar app that makes that impossible:
 - ⚡ **Live status** of every Claude Code / Codex session — working, waiting
   for you, idle — straight from the menu bar
 - 🔔 **Native notification** the moment an agent needs your input
+- 💬 **Reply from the bar** — answer a waiting Claude Code session in place.
+  AgentBar resumes it through your **local `claude` CLI** — no API key, no
+  copy-pasting back to a terminal
+- ✨ **Ask Claude** — a quick chat box in the menu bar for one-off questions,
+  answers streaming in live
 - ⏪ **Session replay** — browse past sessions as a timeline: prompts, tool
   calls, files touched
 - 🛡 **Skill & MCP audit** — heuristic scan of everything you've installed:
   exfiltration patterns, dangerous commands, injection language, unpinned
-  sources. *(No flags ≠ guaranteed safe — rules are heuristic and every
+  sources — now with an optional **AI review** that reads it all in plain
+  English. *(No flags ≠ guaranteed safe — rules are heuristic and every
   finding shows you exactly why.)*
-- 🔒 **Private by design** — reads local files only; zero network calls, zero
-  telemetry, never writes to `~/.claude` or `~/.codex`
+- 🔒 **Local by design** — monitoring, replay, and the heuristic audit read
+  local files only and make **zero network calls**; AgentBar never writes to
+  `~/.claude` or `~/.codex`. Reply / Ask / AI-review shell out to the `claude`
+  command *you* already installed and logged into — no API key lives in
+  AgentBar, and the CLI uses its own credentials
 
 ## Install
 
@@ -48,14 +57,23 @@ cd App && xcodegen && xcodebuild -scheme AgentBar -configuration Release build
 One cask installs both the app and the `agentbar` CLI:
 
 ```sh
-agentbar            # status table of all current sessions (default)
-agentbar watch      # live-updating status, Ctrl-C to exit
-agentbar replay     # timeline of the most recent session; --json for scripting
-agentbar audit      # scan installed skills/MCP configs; exits 1 on red findings
+agentbar                    # status table of all current sessions (default)
+agentbar watch              # live-updating status, Ctrl-C to exit
+agentbar replay             # timeline of the most recent session; --json for scripting
+agentbar audit              # scan installed skills/MCP configs; exits 1 on red findings
+agentbar ask "why is CI red?"   # one-off question via your local `claude` CLI
+agentbar reply 0 "yes, ship it" # resume a session by index and send a text reply
+agentbar audit --ai         # heuristic scan + a natural-language review from Claude
 ```
 
 `agentbar audit` is CI-friendly: wire it into a pipeline and fail the build
 when a red finding appears.
+
+`ask`, `reply`, and `audit --ai` drive the `claude` binary already on your
+`PATH` (override with `AGENTBAR_CLAUDE_BIN`) — there is no API key and no
+network code in AgentBar itself. `reply` defaults to `--permission-mode
+acceptEdits`; pass `--permission-mode plan` for a dry run or
+`bypassPermissions` to let it run freely.
 
 ## How state detection works
 

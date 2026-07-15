@@ -6,6 +6,8 @@ final class CodexParserTests: XCTestCase {
         let parsed = try CodexParser.parse(fileAt: fixtureURL("codex-basic.jsonl"))
         XCTAssertEqual(parsed.session.provider, .codex)
         XCTAssertEqual(parsed.session.cwd, "/Users/dev/CoolProj")
+        XCTAssertEqual(parsed.session.sessionID, "cx-1")
+        XCTAssertEqual(parsed.session.resumeID, "cx-1")
         XCTAssertEqual(parsed.events.count, 10)
         XCTAssertEqual(parsed.events[0].kind, .meta) // session_meta
         XCTAssertEqual(parsed.events[1].kind, .userMessage("Fix the login bug"))

@@ -247,6 +247,33 @@ Working name **AgentBar** (descriptive: agents + menu bar). Rename before
 first push is trivial; alternatives parked: overwatch (taken by Blizzard,
 avoid), agentdeck, shepherd.
 
+## Addendum (v0.2) — Claude Code integration
+
+The v0.1 non-goal "No control of sessions (no sending input to agents)" is
+**intentionally lifted in v0.2**, along with the strict read-only stance —
+narrowly and on the user's terms.
+
+- **How, not what:** AgentBar never talks to any API. It drives the *local*
+  `claude` binary the user already installed and authenticated, in headless
+  `--print` mode, feeding the prompt over stdin. No API key exists anywhere in
+  AgentBar; the CLI uses its own credentials. Monitoring, replay, and the
+  heuristic audit remain strictly read-only and network-free — the only new
+  capability is invoking a program the user already runs by hand.
+- **Reply to a session** (`AgentKit.ClaudeCLI` + `SessionReplyView`): resume a
+  Claude Code session by its id (`--resume`) in its project directory and send
+  a text turn. Permission posture is always explicit and surfaced in the UI
+  (`ClaudePermissionMode`), defaulting to `acceptEdits` for replies and
+  read-only `default` for chat.
+- **Ask** (`AskView`): a streaming quick-chat that runs `claude -p`; a menu-bar
+  entry point opens it directly.
+- **AI audit** (`AuditAIReviewView`, `agentbar audit --ai`): sends the
+  collected inventory to `claude` in `plan` mode for a natural-language review
+  that complements — never replaces — the heuristic rules and disclaimer.
+- **Boundaries kept:** still no telemetry, still no writes to `~/.claude` /
+  `~/.codex`, still Foundation-only (the CLI is spawned via `Foundation.Process`;
+  no new dependencies). Codex sessions are not resumable from AgentBar (the
+  `claude` CLI only resumes Claude Code sessions).
+
 ## Roadmap (post-v0.1, parked)
 
 - v0.2: token/cost stats per session; configurable thresholds; hook-based

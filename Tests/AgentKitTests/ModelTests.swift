@@ -19,6 +19,32 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(s.projectName, "?")
     }
 
+    func testResumeIDPrefersSessionID() {
+        let s = Session(provider: .claudeCode,
+                        fileURL: URL(fileURLWithPath: "/p/uuid-abc.jsonl"),
+                        title: nil, cwd: nil, gitBranch: nil, startedAt: nil,
+                        lastEventAt: nil, sessionID: "real-id")
+        XCTAssertEqual(s.resumeID, "real-id")
+    }
+
+    func testResumeIDFallsBackToClaudeFilenameStem() {
+        // Older Claude Code transcripts carried no sessionId field; the file's
+        // UUID stem is the session id.
+        let s = Session(provider: .claudeCode,
+                        fileURL: URL(fileURLWithPath: "/p/uuid-abc.jsonl"),
+                        title: nil, cwd: nil, gitBranch: nil, startedAt: nil,
+                        lastEventAt: nil)
+        XCTAssertEqual(s.resumeID, "uuid-abc")
+    }
+
+    func testResumeIDNilForCodexWithoutSessionID() {
+        let s = Session(provider: .codex,
+                        fileURL: URL(fileURLWithPath: "/p/rollout-x.jsonl"),
+                        title: nil, cwd: nil, gitBranch: nil, startedAt: nil,
+                        lastEventAt: nil)
+        XCTAssertNil(s.resumeID)
+    }
+
     func testDefaultThresholds() {
         let t = StateThresholds()
         XCTAssertEqual(t.active, 30); XCTAssertEqual(t.settle, 5)

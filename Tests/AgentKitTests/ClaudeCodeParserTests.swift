@@ -8,6 +8,8 @@ final class ClaudeCodeParserTests: XCTestCase {
         XCTAssertEqual(parsed.session.title, "Login bug fix")
         XCTAssertEqual(parsed.session.cwd, "/Users/dev/CoolProj")
         XCTAssertEqual(parsed.session.gitBranch, "main")
+        XCTAssertEqual(parsed.session.sessionID, "fx-1")
+        XCTAssertEqual(parsed.session.resumeID, "fx-1")
         XCTAssertEqual(parsed.skippedLines, 0)
 
         // 5 timestamped events: user, attachment(meta), assistant, user(tool_result→meta),

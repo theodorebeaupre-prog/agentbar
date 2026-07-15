@@ -5,6 +5,7 @@ import AgentKit
 
 extension Notification.Name {
     static let agentBarOpenMainWindow = Notification.Name("agentBarOpenMainWindow")
+    static let agentBarShowAsk = Notification.Name("agentBarShowAsk")
 }
 
 @MainActor

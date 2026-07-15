@@ -7,12 +7,13 @@ public enum ClaudeCodeParser {
     public static func parse(fileAt url: URL) throws -> ParsedSession {
         let (objects, skipped) = try TolerantJSONL.objects(at: url)
         var events: [SessionEvent] = []
-        var title: String?, cwd: String?, branch: String?
+        var title: String?, cwd: String?, branch: String?, sessionID: String?
         var firstTS: Date?, lastTS: Date?
 
         for obj in objects {
             if cwd == nil { cwd = obj["cwd"] as? String }
             if branch == nil { branch = obj["gitBranch"] as? String }
+            if sessionID == nil { sessionID = obj["sessionId"] as? String }
             if let t = obj["customTitle"] as? String { title = t }
 
             let ts = Timestamps.parse(obj["timestamp"] as? String)
@@ -29,7 +30,8 @@ public enum ClaudeCodeParser {
 
         let session = Session(provider: .claudeCode, fileURL: url, title: title,
                               cwd: cwd, gitBranch: branch,
-                              startedAt: firstTS, lastEventAt: lastTS)
+                              startedAt: firstTS, lastEventAt: lastTS,
+                              sessionID: sessionID)
         return ParsedSession(session: session, events: events, skippedLines: skipped)
     }
 

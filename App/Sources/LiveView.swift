@@ -16,13 +16,21 @@ struct LiveMenuContent: View {
                 }
             }
             Divider()
+            Button {
+                openWindow(id: "main")
+                NotificationCenter.default.post(name: .agentBarShowAsk, object: nil)
+            } label: {
+                Label("Ask Claude…", systemImage: "sparkles").font(.caption)
+            }
+            .buttonStyle(.borderless)
+            .padding(.horizontal, 12).padding(.top, 2)
             HStack {
                 Text("AgentBar \(AgentKitInfo.version)").font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
                 Button("Open AgentBar") { openWindow(id: "main") }.font(.caption)
                 Button("Quit") { NSApp.terminate(nil) }.font(.caption)
-            }.padding(.horizontal, 12).padding(.bottom, 8)
+            }.padding(.horizontal, 12).padding(.bottom, 8).padding(.top, 4)
         }
         .frame(width: 340)
     }

@@ -7,7 +7,7 @@ public enum CodexParser {
     public static func parse(fileAt url: URL) throws -> ParsedSession {
         let (objects, skipped) = try TolerantJSONL.objects(at: url)
         var events: [SessionEvent] = []
-        var cwd: String?
+        var cwd: String?, sessionID: String?
         var firstTS: Date?, lastTS: Date?
 
         for obj in objects {
@@ -17,6 +17,7 @@ public enum CodexParser {
             let payload = obj["payload"] as? [String: Any]
             if (obj["type"] as? String) == "session_meta" {
                 cwd = payload?["cwd"] as? String
+                sessionID = payload?["session_id"] as? String
                 events.append(SessionEvent(timestamp: ts, kind: .meta))
                 continue
             }
@@ -25,7 +26,8 @@ public enum CodexParser {
 
         let session = Session(provider: .codex, fileURL: url, title: nil,
                               cwd: cwd, gitBranch: nil,
-                              startedAt: firstTS, lastEventAt: lastTS)
+                              startedAt: firstTS, lastEventAt: lastTS,
+                              sessionID: sessionID)
         return ParsedSession(session: session, events: events, skippedLines: skipped)
     }
 
